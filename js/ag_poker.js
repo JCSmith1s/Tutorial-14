@@ -5,8 +5,8 @@
    Tutorial 14
    Tutorial Case
 
-   Author: 
-   Date:   
+   Author: Josiah Smith
+   Date: 4/13/26  
    
    Filename: ag_poker.js
 
@@ -22,10 +22,18 @@ function playDrawPoker() {
   var handValueText = document.getElementById("handValue");
   var betSelection = document.getElementById("bet");
   var bankBox = document.getElementById("bank");
+  var cardImages = document.querySelectorAll("img.cardImg");
 
   // Set the initial values of the pokerGame object
   pokerGame.currentBank = 500;
   pokerGame.currentBet = 25;
+
+  // Create a new deck of cards and shuffle it
+  var myDeck = new pokerDeck();
+  myDeck.shuffle();
+
+  // Create a pokerHand object
+  var myHand = new pokerHand(5);
 
   bankBox.value = pokerGame.currentBank;
   betSelection.onchange = function (e) {
@@ -34,14 +42,37 @@ function playDrawPoker() {
     );
   };
 
+  // Restart the game when the Reset button is clicked
+  resetButton.addEventListener("click", function () {
+    pokerGame.currentBank = 500;
+    bankBox.value = pokerGame.currentBank;
+    enableObj(dealButton);
+    enableObj(betSelection);
+    disableObj(drawButton);
+    disableObj(standButton);
+  });
+
   //   Enable the Draw and Stand buttons after the deal
   dealButton.addEventListener("click", function () {
-    if (pokerGame.currentBet >= pokerGame.currentBet) {
+    if (pokerGame.currentBank >= pokerGame.currentBet) {
       disableObj(dealButton);
       disableObj(betSelection);
       enableObj(drawButton);
       enableObj(standButton);
       bankBox.value = pokerGame.placeBet();
+
+      // Deal cards into the poker hand after confirming
+      // there are at least 10 cards in the deck
+      if (myDeck.cards.length < 10) {
+        myDeck = new pokerDeck();
+        myDeck.shuffle();
+      }
+      myDeck.dealTo(myHand);
+
+      // Display the card images on the table
+      for (var i = 0; i < cardImages.length; i++) {
+        cardImages[i].src = myHand.cards[i].cardImage();
+      }
     } else {
       alert("Reduce the size of your bet");
     }
